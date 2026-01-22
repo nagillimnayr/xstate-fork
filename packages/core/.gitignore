@@ -2,3 +2,8 @@ es
 dist
 lib
 node_modules
+
+# stryker temp files
+.stryker-tmp
+stryker-tmp
+reports/mutation/
