@@ -1,5 +1,6 @@
 // @ts-check
 
+const reportName = `mutation-${new Date().toISOString().split('T')[0]}`;
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
@@ -22,38 +23,24 @@ const config = {
   fileLogLevel: 'info',
 
   htmlReporter: {
-    fileName: "reports/mutation/mutation-createActor-06.html",
+    fileName: `reports/mutation/${reportName}.html`,
   },
   jsonReporter: {
-    fileName: "reports/mutation/mutation-createActor-06.json",
+    fileName: `reports/mutation/${reportName}.json`,
   },
 
    mutate: [
-    "src/createActor.ts",              // 270
+    // "src/createActor.ts",              // 270
     // "src/StateMachine.ts",             // 149
     // "src/utils.ts",                    // 231
     // "src/StateNode.ts",                // 166
     // "src/stateUtils.ts",               // 885
     // "src/State.ts",                    // 116
-
     // "src/actions/send.ts",             // 121
-    // "src/actions/assign.ts",           // 33
-    // "src/actions/raise.ts",            // 56
-    // "src/actions/enqueueActions.ts",   // 21
-    // "src/actions/spawnChild.ts",       // 46
-    // "src/actions/stopChild.ts",        // 39
-
-    // "src/actors/callback.ts",          // 32
-    // "src/actors/observable.ts",        // 84
-    // "src/actors/promise.ts",           // 49
-    // "src/actors/transition.ts",        // 14
-
-    // 'src/graph/graph.ts',              // 60
   ],
   
   mutator: {
     excludedMutations: [
-      // "StringLiteral",
       // "BlockStatement",
     ],
   },
