@@ -122,7 +122,9 @@
     "interpreter",
     "graph"
   ],
-  "scripts": {},
+  "scripts": {
+    "stryker": "stryker run"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/statelyai/xstate.git"
@@ -135,6 +137,7 @@
   "homepage": "https://github.com/statelyai/xstate/tree/main/packages/core#readme",
   "devDependencies": {
     "@scion-scxml/test-framework": "^2.0.15",
+    "@stryker-mutator/api": "^9.4.0",
     "@stryker-mutator/core": "^9.4.0",
     "@stryker-mutator/vitest-runner": "^9.4.0",
     "ajv": "^8.12.0",

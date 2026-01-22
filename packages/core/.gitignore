@@ -7,3 +7,4 @@ node_modules
 .stryker-tmp
 stryker-tmp
 reports/mutation/
+stryker.log

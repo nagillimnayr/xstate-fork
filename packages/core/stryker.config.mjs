@@ -1,10 +1,12 @@
 // @ts-check
+
+
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
   _comment:
     "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
   packageManager: 'npm',
-  reporters: ['html', 'clear-text', 'progress'],
+  reporters: ['html', 'clear-text', 'progress', 'json'],
   testRunner: 'vitest',
   testRunner_comment:
     'Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.',
@@ -16,12 +18,18 @@ const config = {
     "stryker-tmp/**",
   ],
 
+  // @ts-ignore
+  fileLogLevel: 'info',
+
   htmlReporter: {
-    fileName: "reports/mutation/mutation.html",
+    fileName: "reports/mutation/mutation-createActor-06.html",
+  },
+  jsonReporter: {
+    fileName: "reports/mutation/mutation-createActor-06.json",
   },
 
    mutate: [
-    // "src/createActor.ts",              // 270
+    "src/createActor.ts",              // 270
     // "src/StateMachine.ts",             // 149
     // "src/utils.ts",                    // 231
     // "src/StateNode.ts",                // 166
