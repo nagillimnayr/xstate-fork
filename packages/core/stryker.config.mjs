@@ -1,5 +1,8 @@
 // @ts-check
-const reportName = `mutation-${new Date().toLocaleDateString('en-CA')}`;
+
+const dateTime = new Date();
+const fileName = 'createActor';
+const reportName = `mutation-${fileName.replace('/', '-')}_${dateTime.toISOString().split('.')[0].replace(/:/g, '-')}`;
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
@@ -13,45 +16,41 @@ const config = {
   coverageAnalysis: 'perTest',
   plugins: ['@stryker-mutator/vitest-runner'],
 
-  tempDirName: "stryker-tmp",
-  ignorePatterns: [
-    "stryker-tmp/**",
-  ],
+  tempDirName: 'stryker-tmp',
+  ignorePatterns: ['stryker-tmp/**'],
 
   // @ts-ignore
   fileLogLevel: 'info',
 
   htmlReporter: {
-    fileName: `reports/mutation/${reportName}.html`,
+    fileName: `reports/mutation/${reportName}.html`
   },
   jsonReporter: {
-    fileName: `reports/mutation/${reportName}.json`,
+    fileName: `reports/mutation/${reportName}.json`
   },
 
-   mutate: [
-    "src/createActor.ts",              // 270
-    "src/StateMachine.ts",             // 149
-    "src/utils.ts",                    // 231
+  mutate: [
+    `src/${fileName}.ts`
+    // "src/createActor.ts",              // 270
+    // "src/StateMachine.ts",             // 149
+    // "src/utils.ts",                    // 231
+    // "src/State.ts",                    // 116
     // "src/StateNode.ts",                // 166
     // "src/stateUtils.ts",               // 885
-    "src/State.ts",                    // 116
     // "src/actions/send.ts",             // 121
   ],
-  
+
   mutator: {
-    excludedMutations: [
-      // "BlockStatement",
-    ],
+    excludedMutations: ['BlockStatement']
   },
   ignoreStatic: true,
-  
+
   timeoutFactor: 2,
   timeoutMS: 3 * 60 * 1000,
-  
+
   vitest: {
     dir: './',
-    related: true,
+    related: true
   }
-   
 };
 export default config;
