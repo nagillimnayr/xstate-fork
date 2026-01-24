@@ -1,8 +1,7 @@
 // @ts-check
 
 const dateTime = new Date();
-const fileName = 'createActor';
-const reportName = `mutation-${fileName.replace('/', '-')}_${dateTime.toISOString().split('.')[0].replace(/:/g, '-')}`;
+const reportName = `mutation_${dateTime.toISOString().split('.')[0].replace(/:/g, '-')}`;
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
@@ -30,7 +29,6 @@ const config = {
   },
 
   mutate: [
-    `src/${fileName}.ts`
     // "src/createActor.ts",              // 270
     // "src/StateMachine.ts",             // 149
     // "src/utils.ts",                    // 231
