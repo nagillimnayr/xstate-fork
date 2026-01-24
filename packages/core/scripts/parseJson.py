@@ -9,10 +9,10 @@ def originalCode(path, startLine, endLine):
 
     code = ""
     if startLine == endLine:
-        code = "-    " + lines[startLine]
+        code = "-" + lines[startLine]
     else:
         for i in range(startLine, endLine + 1):
-            code += "-    " + lines[i]
+            code += "-" + lines[i]
 
     return code
 
@@ -20,20 +20,27 @@ def replacedCode(path, replacement, startLine, endLine, startCol, endCol):
     with open(path, 'r') as f:
         lines = f.readlines()
 
+        replacement = replacement.replace('\n', '\n+') # some replacements has newlines need to add '+'
+
         code = ""
         if startLine == endLine:
-            code = "+    " + lines[startLine][:startCol] + replacement + lines[startLine][endCol:]
+            code = "+" + lines[startLine][:startCol] + replacement + lines[startLine][endCol:]
         else:
-            code += "+    " + lines[startLine][:startCol] + replacement + lines[endLine][endCol:]
+            code += "+" + lines[startLine][:startCol] + replacement + lines[endLine][endCol:]
         return code 
 
-def mutationReport(file, data):
+def mutationReport(file, data, reportType):
     mutants = data["files"][file]["mutants"]
 
     # dict values are also dicts for status : count
     mutantStats = defaultdict(lambda: defaultdict(int))
 
-    print("## Mutants")
+    if (reportType != "-diff"):
+        print("___")
+        print(f"# Mutation Testing on Source File: {file}")
+        print("___")
+        print("## Mutants")
+
     for mutant in mutants:
         name = mutant["mutatorName"]
         status = mutant["status"]
@@ -45,11 +52,19 @@ def mutationReport(file, data):
 
         mutantStats[name][status] = mutantStats[name].get(status, 0) + 1 # counting mutant types
 
+        if (status == "Ignored"):
+            continue
+
         original = originalCode(file, startLine - 1, endLine - 1)
         replaced = replacedCode(file, replacement, startLine - 1, endLine - 1, startCol - 1, endCol - 1)
-        printMutantDiff(name, status, replacement, original, replaced, startLine, endLine, startCol, endCol)
 
-    printMutationCount(file, mutants, mutantStats)
+        if (reportType == "-diff"):
+            printMutantOnlyDiff(original, replaced)
+        else:
+            printMutantDiff(name, status, replacement, original, replaced, startLine, endLine, startCol, endCol)
+
+    if (reportType != "-diff"):
+        printMutationCount(file, mutants, mutantStats)
         
 def printMutantDiff(name, status, replacement, original, replaced, startLine, endLine, startCol, endCol):
     print(f"**Type**: {name}, **Status**: {status}")
@@ -63,20 +78,33 @@ def printMutantDiff(name, status, replacement, original, replaced, startLine, en
     print("```")
     print()
 
+def printMutantOnlyDiff(original, replaced):
+    print("```diff")
+    print(original, end="")
+    print(replaced, end="")
+    print("```")
+    print()
+
 def printMutationCount(file, mutants, mutantStats):
     print(f"## Results of Mutation Testing on Source File: {file}")
     print()
-    print(f"### Total Mutants: {len(mutants)}")
+    print(f"**Total Mutants:** {len(mutants)}")
     print()
     for name, stats in mutantStats.items():
-        print(f"#### Mutant: {name}")
+        print(f"**Mutant:** {name}")
+        print("| Status | Count |")
+        print("| ------ | ----- |")
         for status, count in stats.items():
-            print(f"&ensp;**Status**: {status}, **Count**: {count}")
-            print()
+            print(f" | {status} | {count} |")
+        print()
     print()
 
 def main():
     jsonPath = sys.argv[1]
+    reportType = ""
+    if len(sys.argv) > 2:
+        reportType = sys.argv[2]
+
     with open(jsonPath, 'r') as f:
         data = json.load(f) # converts json to python dictionary
 
@@ -87,10 +115,7 @@ def main():
         sys.stdout = f
         files = list(data["files"])
         for file in files:
-            print("___")
-            print(f"# Mutation Testing on Source File: {file}")
-            print("___")
-            mutationReport(file, data)
+            mutationReport(file, data, reportType)
     sys.stdout = o
 
 if __name__ == "__main__":

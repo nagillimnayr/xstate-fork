@@ -123,7 +123,8 @@
     "graph"
   ],
   "scripts": {
-    "stryker": "stryker run"
+    "stryker": "stryker run",
+    "report": "python3 ./scripts/parseJson.py"
   },
   "repository": {
     "type": "git",

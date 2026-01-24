@@ -1,6 +1,5 @@
 // @ts-check
-
-const reportName = `mutation-${new Date().toISOString().split('T')[0]}`;
+const reportName = `mutation-${new Date().toLocaleDateString('en-CA')}`;
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
@@ -30,12 +29,12 @@ const config = {
   },
 
    mutate: [
-    // "src/createActor.ts",              // 270
-    // "src/StateMachine.ts",             // 149
-    // "src/utils.ts",                    // 231
+    "src/createActor.ts",              // 270
+    "src/StateMachine.ts",             // 149
+    "src/utils.ts",                    // 231
     // "src/StateNode.ts",                // 166
     // "src/stateUtils.ts",               // 885
-    // "src/State.ts",                    // 116
+    "src/State.ts",                    // 116
     // "src/actions/send.ts",             // 121
   ],
   
