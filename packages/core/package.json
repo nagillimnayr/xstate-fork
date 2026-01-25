@@ -124,7 +124,7 @@
   ],
   "scripts": {
     "stryker": "stryker run",
-    "report": "python ./scripts/parseJson.py"
+    "report": "python3 ./scripts/parseJson.py"
   },
   "repository": {
     "type": "git",
