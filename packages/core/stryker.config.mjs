@@ -1,7 +1,20 @@
 // @ts-check
 
 const dateTime = new Date();
-const reportName = `mutation_${dateTime.toISOString().split('.')[0].replace(/:/g, '-')}`;
+const dateFormatter = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false
+});
+const dateString = dateFormatter
+  .format(dateTime)
+  .replace(/, /g, '_')
+  .replace(/\//g, '-')
+  .replace(/:/g, '-');
+const reportName = `mutation_${dateString}`;
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
@@ -29,13 +42,13 @@ const config = {
   },
 
   mutate: [
-    // "src/createActor.ts",              // 270
-    // "src/StateMachine.ts",             // 149
-    // "src/utils.ts",                    // 231
-    // "src/State.ts",                    // 116
-    // "src/StateNode.ts",                // 166
-    // "src/stateUtils.ts",               // 885
-    // "src/actions/send.ts",             // 121
+    // 'src/createActor.ts', // 270
+    // 'src/StateMachine.ts', // 149
+    // 'src/utils.ts', // 231
+    // 'src/State.ts' // 116
+    // 'src/StateNode.ts', // 166
+    // 'src/stateUtils.ts', // 885
+    // 'src/actions/send.ts' // 121
   ],
 
   mutator: {
@@ -44,7 +57,7 @@ const config = {
   ignoreStatic: true,
 
   timeoutFactor: 2,
-  timeoutMS: 3 * 60 * 1000,
+  timeoutMS: 5 * 60 * 1000,
 
   vitest: {
     dir: './',

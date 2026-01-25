@@ -65,9 +65,11 @@ def process_mutants(source_code: list[str], mutants: list[dict], diff_file: Text
 
         stats[mutation_operator][status] += 1
 
+        if replacement == "``":
+            replacement = "`` `` ``"  # Escape backticks
         print(f"### Mutant({id}): {mutation_operator}, Status: {status}\n", file=diff_file)
         print(
-            f"**Replacement:** `{replacement.replace("``", "`` `` ``")}`, " + # Escape backticks in replacement
+            f"**Replacement:** `{replacement}`, " + # Escape backticks in replacement
             f"**Start:** {start_line}:{start_col}, " +
             f"**End:** {end_line}:{end_col}\n",
             file=diff_file
