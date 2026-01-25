@@ -42,11 +42,11 @@ const config = {
   },
 
   mutate: [
-    // 'src/createActor.ts', // 270
+    'src/createActor.ts' // 270
     // 'src/StateMachine.ts', // 149
     // 'src/utils.ts', // 231
     // 'src/State.ts' // 116
-    // 'src/StateNode.ts', // 166
+    // 'src/StateNode.ts' // 166
     // 'src/stateUtils.ts', // 885
     // 'src/actions/send.ts' // 121
   ],
