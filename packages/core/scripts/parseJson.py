@@ -35,10 +35,12 @@ def get_diff(
     end_col: int
 ) -> str:
     diff: str = "```diff\n"
-    source_lines = source[start_line:end_line + 1]
-    for line in source_lines:
+    # diff += source[start_line - 1]
+    diff_lines = source[start_line:end_line + 1]
+    for line in diff_lines:
         diff += "-" + line
-    diff += "+" + source_lines[0][:start_col] + replacement + source_lines[-1][end_col:]
+    diff += "+" + diff_lines[0][:start_col] + replacement + diff_lines[-1][end_col:]
+    # diff += source[end_line + 1]
     return diff + "```"
 
 def process_mutants(source_code: list[str], mutants: list[dict], diff_file: TextIOWrapper):
@@ -107,9 +109,23 @@ def main():
             mutant_stats = process_mutants(source_code, mutants, diff_file)
             print("| Mutation Operator | Total | Killed | Survived | Timeout | No Coverage | Runtime Error | Compile Error |", file=stats_file)
             print("| ------ | ------ | ----- | ------ | ------ | ------ | ------ | ------ |", file=stats_file)
+            
+            all_stats: MutantStats = defaultdict(int)
             for mutation_operator, stats in mutant_stats.items():
-                print(f"| {mutation_operator} | {stats['total']} | {stats['killed']} | {stats['survived']} | {stats['timeout']} | {stats['no_coverage']} | {stats['runtime_error']} | {stats['compile_error']} |", file=stats_file)
-      
+                print(f"| {mutation_operator} | {stats['total'] - all_stats['ignored']} | {stats['killed']} | {stats['survived']} | {stats['timeout']} | {stats['no_coverage']} | {stats['runtime_error']} | {stats['compile_error']} |", file=stats_file)
+                for key in stats.keys():
+                    all_stats[key] += stats[key]
 
+            total_mutants = all_stats['total'] - all_stats['ignored']
+            print(f"| | {total_mutants} | {all_stats['killed']} | {all_stats['survived']} | {all_stats['timeout']} | {all_stats['no_coverage']} | {all_stats['runtime_error']} | {all_stats['compile_error']} |", file=stats_file)
+
+            total_detected = all_stats['killed'] + all_stats['timeout']
+            total_undetected = all_stats['survived'] + all_stats['no_coverage']
+            total_valid_mutants = total_detected + total_undetected
+            effectiveness = (total_detected / total_valid_mutants) * 100 if total_valid_mutants > 0 else 0.0
+
+            print("\n| Total Valid Mutants | Detected Mutants | Undetected Mutants | Effectiveness |", file=stats_file)
+            print("| ------ | ------ | ------ | ------ |", file=stats_file)
+            print(f"| {total_valid_mutants} | {total_detected} | {total_undetected} | {effectiveness:.2f}% |", file=stats_file)
 if __name__ == "__main__":
     main()
