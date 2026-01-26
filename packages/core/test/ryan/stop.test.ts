@@ -41,20 +41,18 @@ describe('actor.stop()', () => {
     const parentActor = createActor(parentMachine);
 
     const errorMessages: string[] = [];
+    const errorSpy = vi.fn();
     const subscription = parentActor.subscribe({
-      error: (err) => {
-        console.log('Caught error from parent actor:', err);
-        if (err instanceof Error) {
-          errorMessages.push(err.message);
-        }
-      },
+      error: errorSpy,
     });
 
     parentActor.start();
     parentActor.send({ type: 'stopChild' });
 
-    expect(errorMessages.length).toBe(1);
-    expect(errorMessages[0]).toBe(expectedErrorMessage);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    const errorCallArg = errorSpy.mock.calls[0][0];
+    expect(errorCallArg).toBeInstanceOf(Error);
+    expect((errorCallArg as Error).message).toBe(expectedErrorMessage);
 
     const { status, error } = parentActor.getSnapshot();
     expect(status).toBe('error');

@@ -12,12 +12,12 @@ describe('stopChild Action', () => {
     const actor1 = createActor(createMachine({})).start();
     const machine = setup({
       types: {
-        events: {} as { type: 'STOP_CHILD'; actorRef: AnyActorRef },
+        events: {} as { type: 'stopChildEvent'; actorRef: AnyActorRef },
       },
     }).createMachine({
       context: { actorRef: actor1 },
       on: {
-        STOP_CHILD: {
+        stopChildEvent: {
           actions: stopChild(({ event }) => event.actorRef),
         },
       },
@@ -28,24 +28,17 @@ describe('stopChild Action', () => {
     }).start();
 
     const expectedErrorMessage = `Cannot stop child actor ${actor1.id} of ${actor2.id} because it is not a child`;
-    let errorCount = 0;
-    let actualErrorMessage: string | undefined;
 
+    const errorSpy = vi.fn();
     // Catch unhandled errors from actor2
     const subscription = actor2.subscribe({
-      error: (err) => {
-        if (err instanceof Error) {
-          errorCount++;
-          actualErrorMessage = err.message;
-        }
-      },
+      error: errorSpy,
     });
 
-    actor2.send({ type: 'STOP_CHILD', actorRef: actor1 });
+    actor2.send({ type: 'stopChildEvent', actorRef: actor1 });
 
     const { status, error } = actor2.getSnapshot();
-    expect(errorCount).toBe(1);
-    expect(actualErrorMessage).toBe(expectedErrorMessage);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
     expect(status).toBe('error');
     expect(error).toBeInstanceOf(Error);
     expect((error as Error).message).toBe(expectedErrorMessage);
