@@ -1,54 +1,58 @@
+import { ProcessingStatus } from '../../src/createActor.ts';
 import {
-  ActorLogic,
-  ActorRef,
-  ActorRefFrom,
   AnyActorRef,
-  EventObject,
-  Observer,
-  Snapshot,
-  setup,
-  Subscribable,
   createActor,
   createMachine,
-  waitFor,
+  setup,
   stopChild,
-  assign
 } from '../../src/index.ts';
 
-describe('stopChild action', () => {
+describe('stopChild Action', () => {
   it('should throw an error if trying to stop an actor that is not a child', async () => {
-    const machine1 = setup({
-      actions: {
-        STOP_CHILD: (_, params: { target: AnyActorRef }) =>
-          stopChild(params.target)
-      }
+    const actor1 = createActor(createMachine({})).start();
+    const machine = setup({
+      types: {
+        events: {} as { type: 'STOP_CHILD'; actorRef: AnyActorRef },
+      },
     }).createMachine({
-      id: 'machine1',
-      initial: 'active',
-      states: {
-        active: {}
-      }
+      context: { actorRef: actor1 },
+      on: {
+        STOP_CHILD: {
+          actions: stopChild(({ event }) => event.actorRef),
+        },
+      },
     });
-    const actor1 = createActor(machine1);
-    actor1.start();
 
-    const machine2 = createMachine({
-      id: 'machine2',
-      initial: 'active',
-      states: {
-        active: {}
-      }
+    const actor2 = createActor(machine, {
+      input: { actorRef: actor1 },
+    }).start();
+
+    const expectedErrorMessage = `Cannot stop child actor ${actor1.id} of ${actor2.id} because it is not a child`;
+    let errorCount = 0;
+    let actualErrorMessage: string | undefined;
+
+    // Catch unhandled errors from actor2
+    const subscription = actor2.subscribe({
+      error: (err) => {
+        if (err instanceof Error) {
+          errorCount++;
+          actualErrorMessage = err.message;
+        }
+      },
     });
-    const actor2 = createActor(machine2); // Not spawned by actor1
-    actor2.start();
 
-    expect(() =>
-      actor1.send({
-        type: 'STOP_CHILD',
-        target: actor2
-      })
-    ).toThrowError(
-      `Cannot stop child actor ${actor2.id} of ${actor1.id} because it is not a child`
-    );
+    actor2.send({ type: 'STOP_CHILD', actorRef: actor1 });
+
+    const { status, error } = actor2.getSnapshot();
+    expect(errorCount).toBe(1);
+    expect(actualErrorMessage).toBe(expectedErrorMessage);
+    expect(status).toBe('error');
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toBe(expectedErrorMessage);
+
+    // Make sure actor1 is still running
+    expect(actor1.getSnapshot().status).not.toBe(ProcessingStatus.Stopped);
+
+    subscription.unsubscribe();
   });
 });
